@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ABYSSCODE is a Python file encryption and custom encoding utility.">
+  <title>ABYSSCODE — Custom Encoding Utility</title>
+  <style>
+    :root { color-scheme: dark; --bg:#080b12; --panel:#111827; --line:#283449; --text:#eef3ff; --muted:#a7b2c8; --accent:#8be9d0; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif; background:radial-gradient(ellipse at top,#17243a 0,#080b12 55%); color:var(--text); }
+    main { width:min(900px,92vw); margin:0 auto; padding:72px 0; }
+    .tag { color:var(--accent); text-transform:uppercase; letter-spacing:.18em; font-size:.78rem; font-weight:700; }
+    h1 { font-size:clamp(2.6rem,8vw,5.2rem); line-height:1; margin:16px 0; letter-spacing:-.06em; }
+    .sub { color:var(--muted); font-size:1.15rem; max-width:650px; }
+    .panel { background:rgba(17,24,39,.88); border:1px solid var(--line); border-radius:18px; padding:26px; margin-top:28px; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+    a.button { display:inline-block; background:var(--accent); color:#07120f; font-weight:800; padding:12px 18px; border-radius:10px; text-decoration:none; }
+    a.secondary { color:var(--text); border:1px solid var(--line); background:transparent; }
+    code, pre { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+    pre { overflow:auto; padding:16px; border-radius:10px; background:#070a10; border:1px solid var(--line); color:#dce8ff; }
+    h2 { margin-top:0; }
+    .note { color:var(--muted); font-size:.92rem; }
+    footer { margin-top:36px; color:var(--muted); font-size:.88rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="tag">Custom format · Python · AES-256-GCM</div>
+    <h1>ABYSSCODE<span style="color:var(--accent)">.</span></h1>
+    <p class="sub">A custom text-compatible encoding format paired with authenticated encryption. Encode files into an unfamiliar alphabet, then decode them with your key or passphrase.</p>
+    <div class="actions">
+      <a class="button" href="downloads/abysscode.py" download>Download Python script</a>
+      <a class="button secondary" href="README.md">Setup instructions</a>
+    </div>
+    <section class="panel">
+      <h2>Quick start</h2>
+      <p>Install Python, then install the dependency:</p>
+      <pre>py -m pip install cryptography</pre>
+      <p>Generate a key and encrypt a file:</p>
+      <pre>py abysscode.py keygen --out abyss.key
+py abysscode.py encode secret.txt secret.aby --key-file abyss.key</pre>
+      <p>Decrypt it later:</p>
+      <pre>py abysscode.py decode secret.aby recovered.txt --key-file abyss.key</pre>
+      <p class="note">If you downloaded the script into a different folder, use its path in the commands above.</p>
+    </section>
+    <section class="panel">
+      <h2>Security, clearly stated</h2>
+      <p>The custom alphabet is not encryption. AES-256-GCM protects the content and detects tampering; the key or passphrase is what must remain secret. Keep a secure backup of it.</p>
+      <p class="note">This is a small personal project, not a formally audited security product. The website only distributes the Python script; the script runs locally on your computer.</p>
+    </section>
+    <footer>ABYSSCODE · Personal project</footer>
+  </main>
+</body>
+</html>
