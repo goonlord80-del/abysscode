@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090b12">
+<meta name="description" content="ABYSSCODE — encode and decode text with a custom alphabet and AES-GCM encryption, right in your browser.">
+<title>ABYSSCODE — Encoder / Decoder</title>
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#111521;--panel2:#171d2b;--line:#293247;--text:#edf2ff;--muted:#9ca8bf;--accent:#8b7bff;--accent2:#51e0c2;--danger:#ff9eaa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#24234b 0,transparent 50%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{width:min(100% - 32px,1040px);margin:0 auto;padding:44px 0 56px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:34px}.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#4a44a8);display:grid;place-items:center;font-weight:900;box-shadow:0 0 30px #8b7bff35}.brand strong{font-size:18px;letter-spacing:.16em}.brand small{display:block;color:var(--muted);letter-spacing:.03em}.pill{border:1px solid #315b58;color:var(--accent2);border-radius:99px;padding:6px 10px;font-size:12px;white-space:nowrap}
+.hero{text-align:center;margin:28px 0 30px}.eyebrow{color:var(--accent2);text-transform:uppercase;letter-spacing:.22em;font-size:11px;font-weight:750}.hero h1{font-size:clamp(34px,7vw,58px);line-height:1.05;margin:10px 0 14px;letter-spacing:-.045em}.hero h1 span{color:var(--accent)}.hero p{color:var(--muted);max-width:650px;margin:0 auto}
+.card{background:linear-gradient(180deg,#131827,#0f1320);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 20px 70px #0003}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}.tabs{display:flex;gap:5px;background:#090c14;border:1px solid var(--line);padding:4px;border-radius:11px}.tabs button{border:0;background:transparent;color:var(--muted);padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer}.tabs button.active{background:var(--panel2);color:var(--text);box-shadow:inset 0 0 0 1px #38425a}.hint{color:var(--muted);font-size:12px}
+label{display:block;font-size:13px;font-weight:700;margin:0 0 8px;color:#dce3f5}textarea,input{width:100%;background:#090d16;border:1px solid #30394e;border-radius:11px;padding:13px 14px;color:var(--text);font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}textarea{min-height:180px;resize:vertical}textarea:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #8b7bff1d}.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}.keyrow{display:flex;gap:9px}.keyrow input{flex:1;min-width:0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}.btn{border:1px solid var(--line);border-radius:10px;padding:10px 15px;background:#171d2b;color:var(--text);font-weight:750;cursor:pointer}.btn.primary{background:linear-gradient(135deg,#8978ff,#6655df);border-color:transparent;color:white}.btn:hover{filter:brightness(1.12)}.btn:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}.status{margin-top:14px;min-height:24px;color:var(--accent2);font-size:13px}.status.error{color:var(--danger)}.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.mini{border:1px solid var(--line);border-radius:14px;padding:16px;background:#101521}.mini h3{font-size:14px;margin:0 0 5px}.mini p{font-size:12px;color:var(--muted);margin:0}.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:24px}.foot a{color:#b8b0ff}@media(max-width:700px){main{padding-top:22px}.fields,.below{grid-template-columns:1fr}.card{padding:15px}.top{align-items:flex-start}.pill{white-space:normal;text-align:center}.hero{margin-top:18px}textarea{min-height:145px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+  <div class="brand"><div class="logo">A</div><div><strong>ABYSSCODE</strong><small>Custom encoding · browser tool</small></div></div>
+  <div class="pill">Runs locally in your browser</div>
+</header>
+<section class="hero">
+  <div class="eyebrow">A custom data format</div>
+  <h1>Encode beyond <span>ordinary.</span></h1>
+  <p>Convert text into the ABYSSCODE format or decrypt an ABYSSCODE message. Your text and key stay in this browser tab.</p>
+</section>
+<section class="card">
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Mode">
+      <button id="encodeTab" class="active" role="tab" aria-selected="true">Encode</button>
+      <button id="decodeTab" role="tab" aria-selected="false">Decode</button>
+    </div>
+    <span class="hint" id="modeHint">Text → encrypted ABYSSCODE</span>
+  </div>
+  <div class="fields">
+    <div>
+      <label for="inputText" id="inputLabel">Plain text</label>
+      <textarea id="inputText" spellcheck="false" placeholder="Type or paste your message here…"></textarea>
+    </div>
+    <div>
+      <label for="outputText" id="outputLabel">ABYSSCODE output</label>
+      <textarea id="outputText" spellcheck="false" placeholder="Your result appears here…" readonly></textarea>
+    </div>
+  </div>
+  <div style="margin-top:17px">
+    <label for="keyInput">256-bit key (64 hexadecimal characters)</label>
+    <div class="keyrow"><input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your abyss.key contents here"><button class="btn" id="showKey" type="button">Show</button></div>
+    <div class="hint" style="margin-top:7px">Use the same key file as the Python CLI. Generate one with the button below, or run <code>py abysscode.py keygen</code>.</div>
+  </div>
+  <div class="actions">
+    <button class="btn primary" id="runBtn">Encode message</button>
+    <button class="btn" id="swapBtn">Use output as input ↗</button>
+    <button class="btn" id="copyBtn">Copy output</button>
+    <button class="btn" id="clearBtn">Clear</button>
+    <button class="btn" id="generateKeyBtn">Generate key</button>
+    <button class="btn" id="downloadKeyBtn">Download key file</button>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite">Ready. Select a mode and enter a key.</div>
+</section>
+<div class="below">
+  <div class="mini"><h3>🔐 Encryption, not just obfuscation</h3><p>Uses AES-256-GCM. The custom alphabet changes the representation; encryption protects the contents. Keep your key private.</p></div>
+  <div class="mini"><h3>🧩 Compatible with Python</h3><p>Key-based ABYSSCODE messages use the same container format as the Python CLI. Passphrase mode is not supported in this browser version.</p></div>
+</div>
+<footer class="foot">ABYSSCODE is a custom format built on established cryptography, not a new cryptographic algorithm. <br>Open-source project · <a href="https://github.com/" rel="noreferrer">GitHub</a></footer>
+</main>
+<script>
+"use strict";
+const ALPHABET = "JMg75pWqTlFQjy8xNEfwHDioakbGI6LPKz3cCRSOY0mv94trXBeZAU21uVhdn/s+";
+const MAGIC = new Uint8Array([65,66,89,83,83,1]); // ABYSS + version byte
+const $ = id => document.getElementById(id);
+let mode = "encode";
+let generatedKey = null;
+
+function setStatus(message, error=false){ $("status").textContent=message; $("status").className="status"+(error?" error":""); }
+function bytesToB64(bytes){ let binary=""; for(let i=0;i<bytes.length;i+=0x8000) binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length))); return btoa(binary); }
+function b64ToBytes(s){ const binary=atob(s); const out=new Uint8Array(binary.length); for(let i=0;i<binary.length;i++) out[i]=binary.charCodeAt(i); return out; }
+function customEncode(bytes){ return bytesToB64(bytes).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"").split("").map(c=>{if(c==="-" ) return ALPHABET[62]; if(c==="_") return ALPHABET[63]; const n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".indexOf(c); return n>=0?ALPHABET[n]:c;}).join(""); }
+function customDecode(text){
+  const clean=text.replace(/\s/g,"");
+  let standard="";
+  for(const c of clean){const i=ALPHABET.indexOf(c);if(i<0)throw new Error("Input contains a character that is not part of the ABYSSCODE alphabet.");standard += i<62?"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[i]:(i===62?"+":"/");}
+  standard += "=".repeat((4-standard.length%4)%4);
+  return b64ToBytes(standard);
+}
+function concat(...arrays){const size=arrays.reduce((n,a)=>n+a.length,0);const out=new Uint8Array(size);let off=0;for(const a of arrays){out.set(a,off);off+=a.length;}return out;}
+function readKey(){
+  const hex=$("keyInput").value.trim().replace(/\s/g,"");
+  if(!/^[0-9a-fA-F]{64}$/.test(hex)) throw new Error("Key must be exactly 64 hexadecimal characters (32 bytes).");
+  const raw=new Uint8Array(32);for(let i=0;i<32;i++)raw[i]=parseInt(hex.slice(i*2,i*2+2),16);return raw;
+}
+async function importKey(raw,usage){return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,[usage]);}
+function equalPrefix(a,b){if(a.length<b.length)return false;for(let i=0;i<b.length;i++)if(a[i]!==b[i])return false;return true;}
+async function encodeMessage(){
+  const plaintext=new TextEncoder().encode($("inputText").value);
+  const keyRaw=readKey();const salt=crypto.getRandomValues(new Uint8Array(16));const nonce=crypto.getRandomValues(new Uint8Array(12));
+  const header=concat(MAGIC,new Uint8Array([75]),salt,nonce); // K = raw key mode
+  const key=await importKey(keyRaw,"encrypt");
+  const encrypted=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv:nonce,additionalData:header,tagLength:128},key,plaintext));
+  $("outputText").value="ABYSSCODE:"+customEncode(concat(header,encrypted));
+  setStatus("Encoded and encrypted "+plaintext.length+" bytes.");
+}
+async function decodeMessage(){
+  let value=$("inputText").value.trim();
+  if(!value.startsWith("ABYSSCODE:")) throw new Error("Input must start with ABYSSCODE:.");
+  const blob=customDecode(value.slice("ABYSSCODE:".length));
+  const min=MAGIC.length+1+16+12+16;
+  if(blob.length<min||!equalPrefix(blob,MAGIC)) throw new Error("Invalid or incomplete ABYSSCODE payload.");
+  const modeByte=blob[MAGIC.length];if(modeByte!==75) throw new Error("This browser tool supports key-file mode (K), not passphrase mode (P).");
+  let off=MAGIC.length+1;const salt=blob.slice(off,off+16);off+=16;const nonce=blob.slice(off,off+12);off+=12;
+  const header=blob.slice(0,off), ciphertext=blob.slice(off);
+  const key=await importKey(readKey(),"decrypt");
+  let plain;
+  try{plain=new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:nonce,additionalData:header,tagLength:128},key,ciphertext));}
+  catch(e){throw new Error("Decryption failed. Check the key, or the payload may have been modified.");}
+  $("outputText").value=new TextDecoder("utf-8",{fatal:false}).decode(plain);
+  setStatus("Verified and decoded "+plain.length+" bytes.");
+}
+function setMode(next){
+  mode=next;const enc=mode==="encode";
+  $("encodeTab").classList.toggle("active",enc);$("decodeTab").classList.toggle("active",!enc);
+  $("encodeTab").setAttribute("aria-selected",String(enc));$("decodeTab").setAttribute("aria-selected",String(!enc));
+  $("inputLabel").textContent=enc?"Plain text":"ABYSSCODE input";
+  $("outputLabel").textContent=enc?"ABYSSCODE output":"Decoded text";
+  $("inputText").placeholder=enc?"Type or paste your message here…":"Paste an ABYSSCODE: payload here…";
+  $("outputText").placeholder=enc?"Your encrypted result appears here…":"Your decoded message appears here…";
+  $("runBtn").textContent=enc?"Encode message":"Decode message";
+  $("modeHint").textContent=enc?"Text → encrypted ABYSSCODE":"ABYSSCODE → original text";
+  setStatus(enc?"Ready to encode.":"Ready to decode.");
+}
+$("encodeTab").addEventListener("click",()=>setMode("encode"));
+$("decodeTab").addEventListener("click",()=>setMode("decode"));
+$("runBtn").addEventListener("click",async()=>{try{setStatus(mode==="encode"?"Encrypting…":"Decrypting…");if(mode==="encode")await encodeMessage();else await decodeMessage();}catch(e){setStatus(e.message||"Operation failed.",true);}});
+$("swapBtn").addEventListener("click",()=>{const a=$("inputText").value;$("inputText").value=$("outputText").value;$("outputText").value="";setMode(mode==="encode"?"decode":"encode");setStatus("Moved output into input.");});
+$("copyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("outputText").value);setStatus("Output copied.");}catch(e){$("outputText").select();setStatus("Select the output and copy it manually.",true);}});
+$("clearBtn").addEventListener("click",()=>{$("inputText").value="";$("outputText").value="";setStatus("Cleared.");});
+$("showKey").addEventListener("click",()=>{const i=$("keyInput");i.type=i.type==="password"?"text":"password";$("showKey").textContent=i.type==="password"?"Show":"Hide";});
+$("generateKeyBtn").addEventListener("click",()=>{generatedKey=crypto.getRandomValues(new Uint8Array(32));$("keyInput").value=Array.from(generatedKey,b=>b.toString(16).padStart(2,"0")).join("");setStatus("Generated a new random key. Download it and keep it safe.");});
+$("downloadKeyBtn").addEventListener("click",()=>{try{const raw=readKey();const hex=Array.from(raw,b=>b.toString(16).padStart(2,"0")).join("")+"\n";const url=URL.createObjectURL(new Blob([hex],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="abyss.key";a.click();URL.revokeObjectURL(url);setStatus("Key file download started. Keep it private.");}catch(e){setStatus(e.message,true);}});
+</script>
+</body>
+</html>
